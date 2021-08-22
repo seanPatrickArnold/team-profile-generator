@@ -1,8 +1,9 @@
-const Employee = require('./lib/Employee.js');
+// TODO: Include packages needed for this application
+const fs = require('fs');const Employee = require('./lib/Employee.js');
+const inquirer = require('inquirer');
 const Manager = require('./lib/Manager.js');
 const Engineer = require('./lib/Engineer.js');
 const Intern = require('./lib/Intern.js');
-const inquirer = require('inquirer');
 
 const employees = {};
 
@@ -174,7 +175,8 @@ function runFurtherQuestions(questions, employeeType) {
                             runGetInfo();
                         }
                         else {
-                            console.log(employees);
+                            writeToFile('./dist/employeePage.html', generateHTML(employees));
+                            copyFile();
                         }
                     })
         })
@@ -189,19 +191,116 @@ function generateHTML(employees) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
+        <link rel="stylesheet" 
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+            crossorigin="anonymous">
+        <link rel="stylesheet" href="./style.css">
     </head>
     <body>
-        <div>
-            ${Object.values(employees).forEach(employee =>{
-                return
-            })}
+        <div class="team">
+            <p>My Team</p>
         </div>
+        <div class="employees-container">
+            <div class="employees">${Object.values(employees).map(employee =>{
+                    if (employee.type === 'Manager') {
+                    return `
+                <div class="employee card">
+                    <h2>
+                        <p>${employee.name}</p>
+                        <p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eyeglasses" viewBox="0 0 16 16">
+                            <path d="M4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm2.625.547a3 3 0 0 0-5.584.953H.5a.5.5 0 0 0 0 1h.541A3 3 0 0 0 7 8a1 1 0 0 1 2 0 3 3 0 0 0 5.959.5h.541a.5.5 0 0 0 0-1h-.541a3 3 0 0 0-5.584-.953A1.993 1.993 0 0 0 8 6c-.532 0-1.016.208-1.375.547zM14 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+                        </svg>${employee.type}</p>
+                    </h2>
+                    <div class="info-div">
+                        <p class="info">ID: ${employee.id}</p>
+                        <p class="info">Email: <a href = "mailto:${employee.email}">${employee.email}</a></p>
+                        <p class="info">Room: ${employee.room}</p>
+                    </div>
+                </div>`
+                    } else if (employee.type === 'Engineer') {
+                    return `
+                <div class="employee card"> 
+                    <h2>
+                        <p>${employee.name}</p>
+                        <p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eyeglasses" viewBox="0 0 16 16">
+                            <path d="M4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm2.625.547a3 3 0 0 0-5.584.953H.5a.5.5 0 0 0 0 1h.541A3 3 0 0 0 7 8a1 1 0 0 1 2 0 3 3 0 0 0 5.959.5h.541a.5.5 0 0 0 0-1h-.541a3 3 0 0 0-5.584-.953A1.993 1.993 0 0 0 8 6c-.532 0-1.016.208-1.375.547zM14 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+                        </svg>${employee.type}</p>
+                    </h2>
+                    <div class="info-div">
+                        <p class="info">ID: ${employee.id}</p>
+                        <p class="info">Email: <a href = "mailto:${employee.email}">${employee.email}</a></p>
+                        <p class="info">GitHub Username: <a href="https://github.com/${employee.username}">${employee.username}</a></p>
+                    </div>
+                </div>`
+                } else if (employee.type === 'Intern') {
+                    return `
+                <div class="employee card">
+                    <h2>
+                        <p>${employee.name}</p>
+                        <p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eyeglasses" viewBox="0 0 16 16">
+                            <path d="M4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm2.625.547a3 3 0 0 0-5.584.953H.5a.5.5 0 0 0 0 1h.541A3 3 0 0 0 7 8a1 1 0 0 1 2 0 3 3 0 0 0 5.959.5h.541a.5.5 0 0 0 0-1h-.541a3 3 0 0 0-5.584-.953A1.993 1.993 0 0 0 8 6c-.532 0-1.016.208-1.375.547zM14 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"/>
+                        </svg>${employee.type}</p>
+                    </h2>
+                    <div class="info-div">
+                        <p class="info">ID: ${employee.id}</p>
+                        <p class="info">Email: <a href = "mailto:${employee.email}">${employee.email}</a></p>
+                        <p class="info">School: ${employee.school}</p>
+                    </div>
+                </div>`
+                };
+            }).join('')}
+            </div>
+        </div>
+        
         
     </body>
     </html>
     
     `
 }
+
+// TODO: Create a function to write README file
+const writeToFile = (filename, data) => {
+    return new Promise((resolve, reject) => {
+        fs.writeFile(filename, data, err => {
+            // if there's an error, reject the Promise and send the error to the Promise's `.catch()` method
+            if (err) {
+                reject(err);
+                // return out of the function here to make sure the Promise doesn't accidentally execute the resolve() function as well
+                return;
+            }
+
+            // if everything went well, resolve the Promise and send the successful data to the `.then()` method
+            resolve({
+                ok: true,
+                message: 'File created!'
+            });
+        });
+    });
+};
+
+const copyFile = () => {
+    return new Promise((resolve, reject) => {
+        fs.copyFile('./src/style.css', './dist/style.css', err => {
+            // if there's an error, reject the Promise and send the error to the Promise's `.catch()` method
+            if (err) {
+            reject(err);
+            // return out of the function here to make sure the Promise doesn't accidentally execute the resolve() function as well
+            return;
+            }
+    
+            // if everything went well, resolve the Promise and send the successful data to the `.then()` method
+            resolve({
+            ok: true,
+            message: 'File copied!'
+            });
+        });
+        });
+    };
 
 function generateEmployeeDiv(employees) {
     return ``
